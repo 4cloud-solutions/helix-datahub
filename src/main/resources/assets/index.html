@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Data Hub Client Demo</title>
+<!-- meta name="viewport" content="width=device-width, initial-scale=1.0" -->
+<link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+<!-- link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous" -->
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
+<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<!-- script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script -->
+<script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+<script src="cryptojs-core.js"></script>
+<script src="enc-base64.js"></script>
+<script src="hmac.js"></script>
+<script src="sha256.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-inner">
+            <a class="brand" href="#">Data Hub Client Demo</a>
+        </div>
+    </div>
+    <div id="main" class="container">
+        <!-- ============================================= Configuration ================================================ -->
+        <table class="table table-striped">
+            <tr>
+                <td>
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="dataHubServerHostPort">DataHub Servers</label>
+                            <div class="controls">
+                                <input data-bind="value: clientConfig().dataHubServerHostPort" type="text" id="dataHubServerHostPort" readonly>
+                            </div>
+                            <label class="control-label" for="activeDataHubServer">Active DataHub Server</label>
+                            <div class="controls">
+                                <input data-bind="value: clientConfig().activeDataHubServer" type="text" id="activeDataHubServer" readonly>
+                            </div>
+                        </div>
+                    </form>                    
+                </td>
+                <td>
+                    <button data-bind="click: swicthToAlternateServer" class="btn">Switch Server</button>                    
+                </td>
+            </tr>
+        </table>        <!-- ============================================= Sessions ================================================ -->
+        <table class="table table-striped">
+            <tr><td style="width: 225px;"><b>1. Create Session</b></td><td style="width: 175px;"><b>User ID</b></td><td><b>Actions</b></td>
+                <td><span data-bind="visible: signedIn()"><b>Auto-refresh</b></span></td>
+            </tr>
+            <tr>
+                <td>
+                    <span data-bind="visible: signedIn(), text: userSession().csid" class="label label-success"></span>
+                    <span data-bind="visible: !signedIn(), text: 'NONE'" class="label label-important"></span>                    
+                    <p data-bind="visible: signedIn()">
+                        Expiry Countdown: <span data-bind="text: countdownTime()" class="label label-default"></span>
+                    </p>
+                </td>
+                <td>
+                    <form class="form-vertical">
+                        <div class="control-group">
+                            <!-- label class="control-label" for="inputUser">User ID</label -->
+                            <div class="controls">
+                                <input data-bind="value: userSession().userId" type="text" id="inputUser" style="width: 150px;">
+                            </div>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <span data-bind="visible: !signedIn()">
+                        <button data-bind="click: createSession" class="btn">Sign-In</button>
+                    </span>
+                    <span data-bind="visible: signedIn()">
+                        <button data-bind="click: refreshSession" class="btn">Refresh</button>
+                        <button data-bind="click: deleteSession" class="btn">Sign-Out</button>
+                    </span>
+                </td>
+                <td>
+                    <form class="form-vertical">
+                        <div class="control-group" data-bind="visible: signedIn()">
+                            <!-- label class="control-label" for="refreshEnabled">Auto-refresh:</label -->
+                            <div class="controls">
+                                <select data-bind="value: refreshEnabled" type="text" id="refreshEnabled" style="width: 60px;">
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>                    
+                </td>
+            </tr>
+        </table>
+        <!-- ============================================= Websocket ================================================ -->
+        <table class="table table-striped">
+            <tr><td style="width: 225px;"><b>2. Open Websocket</b></td><td><b>Actions</b></td></tr>
+            <tr>
+                <td>
+                    <span data-bind="visible: websocketConnected(), text: 'CONNECTED'" class="label label-success"></span>
+                    <span data-bind="visible: !websocketConnected(), text: 'CLOSED'" class="label label-important"></span>
+                </td>
+                <td>
+                    <button data-bind="visible: !websocketConnected(), click: connectWebsocket" class="btn">Connect</button>
+                    <button data-bind="visible: websocketConnected(), click: closeWebsocket" class="btn">Close</button>
+                </td>
+            </tr>
+        </table>
+        <!-- ============================================= Data Producer API ================================================ -->
+        <table class="table table-striped">
+            <tr>
+                <td style="font-size: 150%"><b>Data Producer API</b>&nbsp;
+                    <span data-bind="visible: producerApiVisible()">
+                        <button data-bind="click: changeProducerApiVisibility" class="btn">-</button>
+                    </span>
+                    <span data-bind="visible: !producerApiVisible()">
+                        <button data-bind="click: changeProducerApiVisibility" class="btn">+</button>
+                    </span>
+                </td>
+            </tr>
+        </table>
+        <!-- ========================================= Own Data Producers ============================================ -->
+        <div data-bind="visible: producerApiVisible()">
+        <table class="table table-striped">
+            <tr>
+                <td><b>Own Data Producers </b></td>
+                <td>
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="ownProducerIdToAdd">Producer ID</label>
+                            <div class="controls">
+                                <input data-bind="value: ownProducerIdToAdd" type="text" id="ownProducerIdToAdd">
+                            </div>
+                        </div>
+                    </form>                    
+                </td>
+                <td>
+                    <button data-bind="click: addOwnProducer" class="btn">Add Producer</button>                    
+                </td>
+            </tr>
+        </table>
+        <table class="table table-striped">
+            <tr>
+                <td><b>Producer ID</b></td>
+                <td><b>Producer Data</b></td>
+                <td><b>Actions</b></td>                
+            </tr>
+            <!-- ko foreach: ownProducers -->
+            <tr>
+                <td>
+                    <p data-bind="text: producerId()"></p> 
+                </td>
+                <td>
+                    <form class="form-vertical">
+                        <div class="control-group">
+                            <!-- label class="control-label" for="inputProducerData">Producer Data</label -->
+                            <div class="controls">
+                                <input data-bind="value: data" type="text" id="inputProducerData" style="width: 150px;">
+                            </div>
+                            <div class="controls"> 
+                                <p data-bind="text: `Since ${timestampToDate(setAt())}`"></p>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <button data-bind="click: $parent.publishProducerData" class="btn">Publish</button>
+                    <button data-bind="click: $parent.getProducerData" class="btn">Retrieve</button>
+                    <button data-bind="click: $parent.deleteProducerData" class="btn">Remove Data</button>
+                    <button data-bind="click: $parent.removeOwnProducer" class="btn">Remove Producer</button>
+                </td>
+            </tr>
+            <!-- /ko -->
+        </table>
+        </div>
+        <!-- ============================================= Data Consumer API ================================================ -->
+        <table class="table table-striped">
+            <tr>
+                <td style="font-size: 150%"><b>Data Consumer API</b>&nbsp;
+                    <span data-bind="visible: consumerApiVisible()">
+                        <button data-bind="click: changeConsumerApiVisibility" class="btn">-</button>
+                    </span>
+                    <span data-bind="visible: !consumerApiVisible()">
+                        <button data-bind="click: changeConsumerApiVisibility" class="btn">+</button>
+                    </span>
+                </td>
+            </tr>
+        </table>
+        <!-- ========================================= Watched Data Producers ============================================ -->
+        <div data-bind="visible: consumerApiVisible()">
+        <table class="table table-striped">
+            <tr>
+                <td><b>Watched Data Producers </b></td>
+                <td>
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="userIdToAdd">User ID</label>
+                            <div class="controls">
+                                <input data-bind="value: userIdToAdd" type="text" id="userIdToAdd">
+                            </div>
+                            <label class="control-label" for="producerIdToAdd">Producer ID</label>
+                            <div class="controls">
+                                <input data-bind="value: producerIdToAdd" type="text" id="producerIdToAdd">
+                            </div>
+                        </div>
+                    </form>                    
+                </td>
+                <td>
+                    <button data-bind="click: addWatchedProducer" class="btn">Add Producer</button>                    
+                </td>
+            </tr>
+        </table>
+        <table class="table table-striped">
+            <tr>
+                <td><b>Status</b></td>
+                <td><b>User ID</b></td>
+                <td><b>Producer ID</b></td>
+                <td><b>Actions</b></td>                
+                <td><b>Producer Data</b></td>
+            </tr>
+            <!-- ko foreach: watchedProducers -->
+            <tr>
+                <td>
+                    <span data-bind="visible: subscribed(), text: 'SUBSCRIBED'" class="label label-success" style="width: 110px;"></span>
+                    <span data-bind="visible: !subscribed(), text: 'NOT SUBSCRIBED'" class="label label-important" style="width: 110px;"></span><br/>                    
+                </td>
+                <td>
+                    <p data-bind="text: userId()"></p>
+                </td>
+                <td>
+                    <p data-bind="text: producerId()"></p> 
+                </td>
+                <td>
+                    <span data-bind="visible: subscribed()">
+                        <button data-bind="click: $parent.auditSubscription" class="btn">Audit Sub.</button>
+                        <button data-bind="click: $parent.unsubscribeForProducerData" class="btn">Un-subscribe</button>
+                    </span>
+                    <span data-bind="visible: !subscribed()">
+                        <button data-bind="click: $parent.subscribeForProducerData" class="btn">Subscribe</button>
+                        <button data-bind="click: $parent.removeWatchedProducer" class="btn">Remove Producer</button>
+                    </span>
+                </td>
+                <td style="background-color: #ccffe6">
+                    <p data-bind="text: data()" style="font-weight: bold"></p> 
+                    <p data-bind="text: `Since ${timestampToDate(setAt())}`"></p> 
+                </td>
+            </tr>
+            <!-- /ko -->
+        </table>
+        </div>
+        <!-- ================================================= Tracing =================================================== -->
+        <table class="table table-striped">
+            <tr>
+                <td style="width: 50%;">
+                    <b>API Log</b>&nbsp;&nbsp;<button data-bind="click: clearApiLog" class="btn">Clear</button>
+                </td>
+                <td style="width: 50%;">
+                    <b>Websocket Log</b>&nbsp;&nbsp;<button data-bind="click: clearWebsocketLog" class="btn">Clear</button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="apiLog" style="width: 100%; height: 175px; overflow-wrap: anywhere; overflow-y: scroll; border: 1px solid black; font-size: small;">
+
+                    </div>
+                </td>
+                <td>
+                    <div id="websocketLog" style="width: 100%; height: 175px; overflow-wrap: anywhere; overflow-y: scroll; border: 1px solid black; font-size: small;">
+
+                    </div>                    
+                </td>
+            </tr>
+        </table>
+        <!-- ================================================= Management =================================================== -->
+        <table class="table table-striped">
+            <tr>
+                <td><b>Admin Menu</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <button data-bind="click: getAllUsers" class="btn">Get All Users</button>
+                    <button data-bind="click: getAllSessions" class="btn">Get All Sessions</button>
+                    <button data-bind="click: getAllConnections" class="btn">Get All Connections</button>
+                    <button data-bind="click: getUserData" class="btn">Get User Data</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <script type="text/javascript">
+        
+    function toString(obj) {
+        if (obj == null) {
+            return "null";
+        }
+        return JSON.stringify(obj);
+    };
+    
+    function timestampToDate(timestamp) {
+        if ((typeof timestamp) != 'number') {
+            return timestamp;
+        }
+        // timestamp is assumed to be in ms
+        return new Date(timestamp).toLocaleString();
+    }
+    
+    function isEmpty(obj) {
+        if (obj == null) {
+            return true;
+        }
+        return $.isEmptyObject(obj);
+    };
+        
+    function parseJSON(jsonStr) {
+        if (jsonStr == null) {
+            return null;
+        }
+        return JSON.parse(jsonStr);
+    };
+    
+    //
+    // JWT Auth-Token Creation
+    //
+    function base64EncodeByteArray(byteArray) {
+        return CryptoJS.enc.Base64.stringify(byteArray);
+    }
+
+    function base64EncodeString(rawString) {
+        var byteArray = CryptoJS.enc.Utf8.parse(rawString);
+        return base64EncodeByteArray(byteArray);
+    }
+
+    function urlEncode(base64EncodedString) {
+        var result = base64EncodedString;
+        // Remove padding = characters
+        result = result.replace(/=+$/, '');
+        // Replace + with - character
+        result = result.replace(/\+/g, '-');
+        // Replace / with _ character
+        result = result.replace(/\//g, '_');
+        return result;
+    }
+
+    var hmacSecret = "abcdefghi123456789";
+    var tokenHeader = {
+        typ: "JWT", 
+        alg: "HS256"
+    }
+    var tokenPayload = {
+        iss: "diy-software.solutions", 
+        iat: 1645472996, 
+        nbf: 1645472996, 
+        exp: 1647888596, 
+        sub: "u1", 
+        userId: "u1"
+    }
+    
+    function createAuthToken(userId) {
+        var base64UrlHeader = urlEncode(base64EncodeString(JSON.stringify(tokenHeader)));
+        var now = Math.floor(Date.now()/1000);
+        tokenPayload.iat = now;
+        tokenPayload.nbf = now;
+        tokenPayload.exp = now + 2592000; // a month: 30 * 24 * 60 * 60
+        tokenPayload.sub = userId;
+        tokenPayload.userId = userId;
+        var base64UrlPayload = urlEncode(base64EncodeString(JSON.stringify(tokenPayload)));
+
+        var signature = CryptoJS.HmacSHA256(base64UrlHeader + "." + base64UrlPayload, hmacSecret);
+        var base64UrlSignature = urlEncode(base64EncodeByteArray(signature));
+        
+        var token = base64UrlHeader + "." + base64UrlPayload + "." + base64UrlSignature;
+        // alert(`Token: ${JSON.stringify(tokenHeader)}.${JSON.stringify(tokenPayload)}\n${token}`);
+        return token;                
+    }
+            
+    function TasksViewModel() {
+        var self = this;
+        self.username = "m";
+        self.password = "p";
+        
+        // 
+        // window.location.hostname -> localhost
+        // window.location.href -> http://localhost:9090/data-hub/application/assets/index.html
+        var urlComponents = window.location.href.split('/');
+        self.secureProtocol = (urlComponents[0] == "https:");
+        self.hostPort = urlComponents[2];
+        console.log(`SECURE-PROTOCOL = ${self.secureProtocol} | HOST:PORT = ${self.hostPort}`);
+        
+        // self.baseUri = function () {
+        //     return "/data-hub/application";
+        // };
+        // self.baseUri = function() {
+        //     return "http://localhost:9090/data-hub/application";
+        // };
+        self.baseUri = function() {
+            return (self.secureProtocol ? "https:" : "http:") + "//" + self.hostPort + "/data-hub/application";
+        };
+        self.signinUri = function(userId) {
+            var uri = self.baseUri() + "/signin?userid=" + userId;
+            return uri;
+        };
+        self.baseInSessionUri = function() {
+            var uri = self.baseUri() + "/csid/" + self.userSession().csid;
+            return uri;            
+        };
+        self.sessionManagementUri = function() {
+            var uri = self.baseInSessionUri();
+            return uri;
+        };
+        self.resourceUri = function(resource) {
+            var uri = self.baseInSessionUri() + "/" + resource;
+            return uri;
+        };
+        self.websocketUri = function() {
+            var uri = self.resourceUri("websocket");
+            if (self.secureProtocol) {
+                uri = uri.replace("https:", "wss:");
+            } else {
+                uri = uri.replace("http:", "ws:");                
+            }
+            return uri;
+        };
+        self.websocketUri0 = function() {
+            var protocol = "ws";
+            if (self.secureProtocol) {
+                protocol = "wss";
+            }
+            var uri = protocol + "://" + self.hostPort + self.resourceUri("websocket");
+            return uri;
+        };
+        self.userUri = function() {
+            var uri = self.baseInSessionUri() + "/users/" + self.userSession().userId;
+            return uri;
+        };
+        self.userResourceUri = function(resource) {
+            var uri = self.userUri() + "/" + resource;
+            return uri;
+        };
+        self.userProducerDataUri = function(userId, producerId) {
+            var uri = self.baseInSessionUri() + "/users/" + userId + "/producers/" + producerId + "/data";
+            return uri;
+        };
+        self.userProducerSubscriptionsUri = function(userId, producerId) {
+            var uri = self.baseInSessionUri() + "/users/" + userId + "/producers/" + producerId + "/subscriptions";
+            return uri;
+        };
+        
+        // Websocket
+        self.websocket = null;
+        self.localClose = false;
+        
+        // Knock-Out Observables
+        
+        self.refreshEnabled = ko.observable("true");
+
+        self.clientConfig = ko.observable({
+            activeDataHubServerInstance: -1,
+            activeDataHubServer: "",
+            // dataHubServerHostPort: ["localhost:9090","localhost:9096"]
+            dataHubServerHostPort: ["localhost:9090","localhost:9091","localhost:9096","localhost:9097"]
+        });
+        
+        self.initializeConfig = function() {
+            // alert("Discovered: " + self.hostPort + ", Configured with: " + self.clientConfig().dataHubServerHostPort
+            //         + ", len = " + self.clientConfig().dataHubServerHostPort.length
+            //         + ", [0] = " + self.clientConfig().dataHubServerHostPort[0]
+            //         + ", [1] = " + self.clientConfig().dataHubServerHostPort[1]);
+            var discoveredServerInstance = self.clientConfig().dataHubServerHostPort.indexOf(self.hostPort);
+            if (discoveredServerInstance < 0) {
+                // The discovered server is not in the configuration array
+                // Add the discovered server to the configuration array
+                self.clientConfig().dataHubServerHostPort.unshift(self.hostPort);
+                discoveredServerInstance = 0;
+            }
+            // The discocvered server is in the array
+            self.clientConfig({
+                activeDataHubServerInstance: discoveredServerInstance,
+                activeDataHubServer: self.hostPort,
+                dataHubServerHostPort: self.clientConfig().dataHubServerHostPort
+            });
+            // alert("Updated configuration: " + self.clientConfig().dataHubServerHostPort);
+        };
+        self.initializeConfig();
+        
+        self.swicthToAlternateServer = function() {
+            // alert("swicthToAlternateServer() called! Existing active server [instance [" + self.clientConfig().activeDataHubServerInstance
+            //         + "] = " + self.hostPort);
+            var newActiveInstance = (self.clientConfig().activeDataHubServerInstance + 1) %  self.clientConfig().dataHubServerHostPort.length;
+            self.hostPort = self.clientConfig().dataHubServerHostPort[newActiveInstance];     
+            self.clientConfig({
+                activeDataHubServerInstance: newActiveInstance,
+                activeDataHubServer: self.hostPort,
+                dataHubServerHostPort: self.clientConfig().dataHubServerHostPort
+            });
+            // alert("swicthToAlternateServer() New active server [" + self.clientConfig().activeDataHubServerInstance
+            //         + "] = " + self.hostPort
+            //         + "/" + self.clientConfig().activeDataHubServer);
+        };      
+        
+        self.producerApiVisible = ko.observable(false);
+        self.consumerApiVisible = ko.observable(false);
+
+        // Session, Websocket & Subscription Status
+        self.signedIn = ko.observable(false);
+        self.websocketConnected = ko.observable(false);
+
+        // For displaying the requests/responses    
+        self.action = ko.observable("");
+        self.dataHubResponseBody = ko.observable("");
+
+        self.userSession = ko.observable({
+            userId: "u1",
+            csid: "csid1",
+            creationTimestamp: "0",
+            expiryTimestamp: "0",
+            authToken: ""
+        });
+
+        self.ownProducers = ko.observableArray();
+        self.ownProducers.push({
+            producerId: ko.observable("p1"),
+            data: ko.observable("TEST_DATA"),
+            setAt: ko.observable("---")
+        });
+        self.ownProducerIdToAdd = ko.observable("");
+
+        self.watchedProducers = ko.observableArray();
+        self.watchedProducers.push({
+            subscribed: ko.observable(false),
+            userId: ko.observable("u1"),
+            producerId: ko.observable("p1"),
+            data: ko.observable(null),
+            setAt: ko.observable("---")
+        });
+        self.userIdToAdd = ko.observable("");
+        self.producerIdToAdd = ko.observable("");
+        
+        self.ajax = function(uri, method, data = null) {
+            var request = {
+                url: uri,
+                type: method,
+                contentType: "application/json",
+                accept: "application/json",
+                acceptEncoding: "*",
+                cache: false,
+                dataType: 'json',
+                data: JSON.stringify(data),
+                beforeSend: function(jqXHR, settings) {
+                    jqXHR.setRequestHeader("Authorization", "Basic " + btoa(self.username + ":" + self.password));
+                    jqXHR.setRequestHeader("Authorization", "Bearer " + self.userSession().authToken);
+                    // console.log(`SETTINGS: ${JSON.stringify(settings)}`);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    self.logApiResponse(jqXHR.status, textStatus, errorThrown);
+                    if (self.action() == 'createSession') {
+                        self.signedIn(false);                        
+                        self.stopCountdown();
+                        self.closeWebsocket();
+                        for (producer of self.watchedProducers()) {
+                            producer.subscribed(false);
+                            producer.data(null);
+                            producer.setAt("---");
+                        }
+                    } else if (self.action() == 'refreshSession') {
+                        self.signedIn(false);                        
+                        self.stopCountdown();
+                        self.closeWebsocket();
+                        for (producer of self.watchedProducers()) {
+                            producer.subscribed(false);
+                            producer.data(null);
+                            producer.setAt("---");
+                        }
+                    } else if (self.action() == 'deleteSession') {
+                        self.signedIn(false);                        
+                        self.stopCountdown();
+                        self.closeWebsocket();
+                        for (producer of self.watchedProducers()) {
+                            producer.subscribed(false);
+                            producer.data(null);
+                            producer.setAt("---");
+                        }
+                    } else if (self.action() == 'connectWebsocket') {
+                        self.websocketConnected(false);                        
+                    }
+                }
+            };
+            return $.ajax(request);
+        };
+
+        self.requestFailed = function(jqXHR, textStatus, data) {
+            console.log(`Ajax error: ${jqXHR.status}, ${textStatus}, ${toString(data)}`);
+            // location.reload();                
+        };
+
+        self.changeProducerApiVisibility = function() {
+            self.producerApiVisible(!self.producerApiVisible());
+        };
+
+        self.changeConsumerApiVisibility = function() {
+            self.consumerApiVisible(!self.consumerApiVisible());
+        };
+
+        self.createSession = function() {
+            // var userId = document.getElementById('inputUserForm').inputUser.value;
+            var userId = self.userSession().userId;
+            var uri = self.signinUri(userId);
+            var authToken = createAuthToken(userId);
+            self.userSession({
+                userId: self.userSession().userId,
+                csid: "csid1",
+                creationTimestamp: "0",
+                expiryTimestamp: "0",
+                authToken: authToken
+            });
+            self.logApiRequest("createSession", "GET", uri);
+            self.ajax(uri, 'GET').done(function(data, textStatus, jqXHR) {
+                // console.log(`jqXHR: ${JSON.stringify(jqXHR)}`);
+                // console.log(`Response Headers: ${JSON.stringify(jqXHR.getAllResponseHeaders())}`);
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+                self.userSession({
+                    userId: self.userSession().userId,
+                    csid: data.csid,
+                    creationTimestamp: data.creationTimestamp,
+                    expiryTimestamp: data.expiryTimestamp,
+                    authToken: self.userSession().authToken
+                });
+                self.signedIn(true);
+                self.refreshEnabled("true");
+                self.startCountdown();
+            });
+        };
+        
+        self.refreshSession = function() {
+            var uri = self.sessionManagementUri();
+            self.logApiRequest("refreshSession", "PATCH", uri);
+            self.ajax(uri, 'PATCH').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+                self.userSession({
+                    userId: self.userSession().userId,
+                    csid: self.userSession().csid,
+                    creationTimestamp: data.timestamp,
+                    expiryTimestamp: data.expiryTimestamp,
+                    authToken: self.userSession().authToken
+                });
+                self.signedIn(true);
+                self.startCountdown();
+            });
+        };
+        
+        self.deleteSession = function() {
+            var uri = self.sessionManagementUri();
+            self.logApiRequest("deleteSession", "DELETE", uri);
+            self.ajax(uri, 'DELETE').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+                self.userSession({
+                    userId: "u1",
+                    csid: "csid1",
+                    creationTimestamp: "0",
+                    expiryTimestamp: "0",
+                    authToken: ""
+                });
+                self.signedIn(false);
+                self.stopCountdown();
+                // Websocket is going to be remotly closed by the server
+                for (producer of self.watchedProducers()) {
+                    producer.subscribed(false);
+                    producer.data(null);
+                    producer.setAt("---");
+                }
+            });
+        };
+        
+        self.addOwnProducer = function() {
+            if (self.ownProducerIdToAdd() == "") {
+                alert("Please, enter the producer ID!");
+                return;
+            }
+            for (producer of self.ownProducers()) {
+                if (self.ownProducerIdToAdd() == producer.producerId()) {
+                    alert("The producer already exist! Please, enter another producer ID!");
+                    return;
+                }
+            }
+            self.ownProducers.push({
+                    producerId: ko.observable(self.ownProducerIdToAdd()),
+                    data: ko.observable(null),
+                    setAt: ko.observable("---")
+            });
+        };
+        
+        self.removeOwnProducer = function(producer) {
+            self.ownProducers.remove(producer);
+        };
+                    
+        self.publishProducerData = function(producer) {
+            var uri = self.userProducerDataUri(self.userSession().userId, producer.producerId());
+            var producerData = {
+                    data: producer.data()
+            };
+            self.logApiRequest("publishProducerData", "PUT", uri, producerData);
+            self.ajax(uri, 'PUT', producerData).done(function(dataUnit, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, dataUnit);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, dataUnit);
+                    return; // -------->
+                }
+                if (isEmpty(dataUnit)) {
+                    producer.setAt("---");
+                } else {
+                    producer.producerId(dataUnit.producerId);
+                    producer.data(self.getAppData(dataUnit));                        
+                    producer.setAt(dataUnit.timestamp);
+                }
+            });
+        };
+
+        self.getProducerData = function(producer) {
+            var uri = self.userProducerDataUri(self.userSession().userId, producer.producerId());
+            self.logApiRequest("getProducerData", "GET", uri);
+            self.ajax(uri, 'GET').done(function(dataUnit, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, dataUnit);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, dataUnit);
+                    return; // -------->
+                }
+                if (isEmpty(dataUnit))  {
+                    producer.setAt("---");
+                } else {
+                    producer.producerId(dataUnit.producerId);
+                    producer.data(self.getAppData(dataUnit));                        
+                    producer.setAt(dataUnit.timestamp);
+                }
+            });
+        };
+
+        self.deleteProducerData = function(producer) {
+            var uri = self.userProducerDataUri(self.userSession().userId, producer.producerId());
+            self.logApiRequest("deleteProducerData", "DELETE", uri);
+            self.ajax(uri, 'DELETE').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+                producer.data(null);
+                producer.setAt("---");
+            });
+        };
+        
+        
+        self.addWatchedProducer = function() {
+            if (self.userIdToAdd() == "") {
+                alert("Please, enter the user ID!");
+                return;
+            }
+            if (self.producerIdToAdd() == "") {
+                alert("Please, enter the producer ID!");
+                return;
+            }
+            for (producer of self.watchedProducers()) {
+                if ((self.userIdToAdd() == producer.userId())
+                    && (self.producerIdToAdd() == producer.producerId())) {
+                    alert("The producer already exist! Please, enter another user or producer ID!");
+                    return;
+                }
+            }
+            self.watchedProducers.push({
+                    subscribed: ko.observable(false),
+                    userId: ko.observable(self.userIdToAdd()),
+                    producerId: ko.observable(self.producerIdToAdd()),
+                    data: ko.observable(null),
+                    setAt: ko.observable("---")
+            });
+        };
+        
+        self.removeWatchedProducer = function(producer) {
+            self.watchedProducers.remove(producer);
+        };
+                    
+        self.subscribeForProducerData = function(producer) {
+            var uri = self.userProducerSubscriptionsUri(producer.userId(), producer.producerId());
+            var subscriberData = {
+                    subscriberId: self.userSession().userId
+            };
+            self.logApiRequest("subscribeForProducerData", "POST", uri, subscriberData);
+            self.ajax(uri, 'POST', subscriberData).done(function(dataUnit, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, dataUnit);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, dataUnit);
+                    return; // -------->
+                }
+                producer.subscribed(true);
+                self.handleDataUpdate(dataUnit);
+                /*
+                if (isEmpty(dataUnit)) {
+                    producer.subscribed(false);
+                    producer.setAt("---");
+                } else {
+                    producer.subscribed(true);
+                    producer.userId(dataUnit.userId);
+                    producer.producerId(dataUnit.producerId);
+                    producer.data(self.getAppData(dataUnit));
+                    producer.setAt(dataUnit.timestamp);                    
+                }
+                 */                       
+            });
+        };
+        
+        self.auditSubscription = function(producer) {
+            var uri = self.userProducerSubscriptionsUri(producer.userId(), producer.producerId());
+            self.logApiRequest("auditSubscription", "GET", uri);
+            self.ajax(uri, 'GET').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+                var ok = false;
+                if (data != null) {
+                    ok = data.includes(self.userSession().csid);
+                };
+                if (!ok) {
+                    producer.subscribed(false);
+                    producer.data(null);
+                    producer.setAt("---");
+                }
+            });
+        };
+        
+        self.unsubscribeForProducerData = function(producer) {
+            var uri = self.userProducerSubscriptionsUri(producer.userId(), producer.producerId());
+            self.logApiRequest("unsubscribeForProducerData", "DELETE", uri);
+            self.ajax(uri, 'DELETE').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+                producer.subscribed(false);
+                producer.data(null);
+                producer.setAt("---");
+            });
+        };
+                    
+        self.handleDataUpdate = function(dataUnit) {
+            console.log(`handleDataUpdate() dataUnit=${toString(dataUnit)}`);
+            var userId = dataUnit.userId;
+            var producerId = dataUnit.producerId;
+            var setAt = dataUnit.timestamp;
+            var data = self.getAppData(dataUnit);
+            if (userId == self.userSession().userId) {
+                for (producer of self.ownProducers()) {
+                    if (producerId == producer.producerId()) {
+                        if (self.isNewer(setAt, producer.setAt())) {
+                            producer.data(data);
+                            producer.setAt(setAt);
+                            break; // ---> out of the loop
+                        }
+                    }
+                }
+            }
+            for (producer of self.watchedProducers()) {
+                if ((userId == producer.userId()) 
+                 && (producerId == producer.producerId())
+                 && self.isNewer(setAt, producer.setAt())) {
+                    producer.data(data);
+                    producer.setAt(setAt);                        
+                    break; // ---> out of the loop
+                }
+            }
+        };
+        
+        self.isNewer = function(newTimestamp, oldTimestamp) {
+            if (!Number.isInteger(oldTimestamp)) {
+                return true;
+            }
+            return (newTimestamp > oldTimestamp);
+        }
+        
+        self.getAllUsers = function() {
+            var uri = self.resourceUri("users");
+            self.logApiRequest("getAllUsers", "GET", uri);
+            self.ajax(uri, 'GET').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+            });
+        };
+
+        self.getAllSessions = function() {
+            var uri = self.resourceUri("sessions");
+            self.logApiRequest("getAllSessions", "GET", uri);
+            self.ajax(uri, 'GET').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+            });
+        };
+
+        self.getAllConnections = function() {
+            var uri = self.resourceUri("connections");
+            self.logApiRequest("getAllConnections", "GET", uri);
+            self.ajax(uri, 'GET').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+            });
+        };
+
+        self.getUserData = function() {
+            var uri = self.userResourceUri("data");
+            self.logApiRequest("getUserData", "GET", uri);
+            self.ajax(uri, 'GET').done(function(data, textStatus, jqXHR) {
+                self.logApiResponse(jqXHR.status, textStatus, data);
+                if (jqXHR.status != "200") {
+                    self.requestFailed(jqXHR, textStatus, data);
+                    return; // -------->
+                }
+            });
+        };
+
+        self.websocket = null;
+        self.connectWebsocket = function() {
+            var uri = self.websocketUri();
+            // There is no API to add an HTTP Authorization header to the HTTP request for openning a Websocket
+            // The code below adds a Sec-WebSocket-Protocol header to the request instead:
+            //     Sec-WebSocket-Protocol: Authorization.Bearer.<jwt-token>
+            self.websocket = new WebSocket(uri, "Authorization.Bearer." + self.userSession().authToken);
+            console.log(`connectWebsocket() called! uri=${uri}`);
+            // self.logWebsocketMsg(`Socket Status: ${self.websocket.readyState}`);
+            self.logApiRequest("connectWebsocket", "GET", uri);
+
+            self.websocket.onopen = function() {
+                console.log(`onopen() called!`);
+                self.websocketConnected(true);
+                self.logApiResponse("CONNECTED", "");
+                self.logWebsocketMsg("Socket Status: OPEN");
+            };
+
+            self.websocket.onmessage = function(messageEvent) {
+                var messageJSON = messageEvent.data;
+                var message = parseJSON(messageJSON);                        
+                self.logWebsocketMsg(messageJSON);
+                console.log(`onmessage() message=${messageJSON}`);
+                if (self.isDataUnit(message)) {
+                    self.handleDataUpdate(message);
+                    return; // ----->
+                }
+            };
+
+            self.websocket.onclose = function() {
+                console.log(`onclose() called! localClose=${self.localClose}`);
+                self.websocketConnected(false);
+                self.logWebsocketMsg("Socket Status: CLOSED");
+                if (self.localClose) {
+                    // Local close
+                    // Done
+                    self.localClose = false;
+                } else {
+                    // Remote close
+                    alert ("Websocket remotely closed!");
+                } 
+            };			
+
+            self.websocket.onerror = function(exception) {
+                console.log(`onerror() called! exception=${exception}`);
+                self.logWebsocketMsg(`Error: ${exception}`);
+            };
+        };
+        
+        self.sendOnWebsocket = function(message) {
+            if (self.websocket != null) {          
+                self.websocket.send(message);
+            }
+        };        
+        
+        self.closeWebsocket = function() {
+            console.log(`closeWebsocket() called!`);
+            self.localClose = true;
+            if (self.websocket != null) {
+                self.websocket.close();
+            }
+        };
+        
+        self.clearWebsocketLog = function() {
+            $('#websocketLog').empty();
+        };
+        
+        self.logWebsocketMsg = function(message) {
+            var presentation = `<p>${message}</p>`;
+            var textarea = $('#websocketLog');
+            textarea.append(presentation);
+            textarea.scrollTop(textarea.prop("scrollHeight")); // attr("scrollHeight");
+        };
+
+        self.clearApiLog = function() {
+            $('#apiLog').empty();
+        };
+        
+        self.logApiRequest = function(operation, method, uri, body = null) {
+            var bodyStr = toString(body);    
+            self.action(operation);
+            self.dataHubResponseBody("");
+            console.log(`${operation}: ${method} ${uri} | ${bodyStr}`);
+            var presentation = `<p style="margin-bottom: 1px;">${new Date().toLocaleString()} <b>${operation}</b>:<br/><b>${method}</b> ${uri}<br/>${bodyStr}</p>`;
+            var textarea = $('#apiLog');
+            textarea.append(presentation);
+            textarea.scrollTop(textarea.prop("scrollHeight")); // attr("scrollHeight");
+        };
+
+        self.logApiResponse = function(status, textStatus, body = null) {
+            var bodyStr = toString(body);    
+            self.dataHubResponseBody(bodyStr);
+            console.log(`${status} ${textStatus} | ${bodyStr}`);
+            var presentation = `<p><b>${status} ${textStatus}</b><br/>${bodyStr}</p>`;
+            var textarea = $('#apiLog');
+            textarea.append(presentation);
+            textarea.scrollTop(textarea.prop("scrollHeight")); // attr("scrollHeight");
+        };
+        
+        self.countdownId = ko.observable(null);
+        self.countdownTime = ko.observable(0);
+        
+        self.startCountdown = function() {
+            self.stopCountdown();
+            var t1 = Date.now();
+            var t2 = self.userSession().expiryTimestamp;
+            // var timeout = 10; // in seconds
+            var timeout =  Math.round(0.75 * (t2 - t1) / 1000);
+            self.countdownTime(timeout);
+            var timerId = setInterval(
+                function time() {
+                    var timeLeft = self.countdownTime() - 1;
+                    self.countdownTime(timeLeft);
+                    if ((timeLeft <= 0) && (self.refreshEnabled() == "true")) {
+                        self.stopCountdown();
+                        self.refreshSession();
+                    }
+                }, 
+                1000 // every second
+            );
+            self.countdownId(timerId);            
+        };
+        
+        self.stopCountdown = function() {
+            if (self.countdownId() != null) {
+                clearInterval(self.countdownId());
+                self.countdownId(null);
+            }
+        };
+        
+        self.isDataUnit = function(object) {
+            if (!object.hasOwnProperty("userId")) {
+                return false;
+            }
+            if (!object.hasOwnProperty("producerId")) {
+                return false;
+            }
+            return true;
+        };
+        
+        self.getAppData = function(dataUnit) {
+            var appData = parseJSON(dataUnit.data);
+            if (appData == null) {
+                return null;
+            } else {
+                return appData.data;
+            }
+        }
+        
+    } // TasksViewModel()
+        
+    var tasksViewModel = new TasksViewModel();
+    ko.applyBindings(tasksViewModel, $('#main')[0]);
+    </script>
+</body>
+</html>
