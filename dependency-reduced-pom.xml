@@ -88,7 +88,7 @@
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-bom</artifactId>
-      <version>1.3.12</version>
+      <version>1.3.14</version>
       <type>pom</type>
       <scope>compile</scope>
     </dependency>
@@ -110,10 +110,9 @@
     </plugins>
   </reporting>
   <properties>
-    <dropwizard-version>1.3.12</dropwizard-version>
+    <dropwizard-version>1.3.14</dropwizard-version>
     <mainClass>solutions.forcloud.helix4j.datahub.DataHubApp</mainClass>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <dropwizard-websockets-version>1.3.14</dropwizard-websockets-version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>

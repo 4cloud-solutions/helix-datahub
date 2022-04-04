@@ -162,6 +162,9 @@ public class DataHubApp extends Application<DataHubConfig> {
     @Override
     public void run(DataHubConfig configuration, Environment environment) throws Exception {
         
+        // Update configuration based on the environmental variables
+        configuration.updateFromEnvironment();
+        
         LOGGER.info("run() called! Application Name='{}', Environment='{}', Configuration='{}'",
                 getName(), environment.getName(), configuration);
         

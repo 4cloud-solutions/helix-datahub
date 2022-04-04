@@ -10,16 +10,16 @@ helixConfig:
 
     # For Redis Stand-Alone (Single-Node) enter a single host below
     datagridHostsA:
-      - "redis://127.0.0.1:6379"
-    #  - "redis://127.0.0.1:7000"
-    #  - "redis://127.0.0.1:7001"
-    #  - "redis://127.0.0.1:7002"
+      - "redis://192.168.0.6:6379"
+    #  - "redis://192.168.0.6:7000"
+    #  - "redis://192.168.0.6:7001"
+    #  - "redis://192.168.0.6:7002"
     # For Redis Stand-Alone (Single-Node) enter a single host below
     datagridHostsB:
-      - "redis://127.0.0.1:6380"
-    #  - "redis://127.0.0.1:7000"
-    #  - "redis://127.0.0.1:7001"
-    #  - "redis://127.0.0.1:7002"
+      - "redis://192.168.0.6:6380"
+    #  - "redis://192.168.0.6:7000"
+    #  - "redis://192.168.0.6:7001"
+    #  - "redis://192.168.0.6:7002"
 
     #
     # Jedis Pool Configuration
@@ -48,8 +48,11 @@ helixConfig:
     #
     replicationRole: "B"         # One of: "A", "B", "NONE"
     replicationTopicNameRoot: ".datagrid.replication.topic"
-    replicationHosts: "localhost:9092"
-    # replicationHosts: "localhost:9092,localhost:9093,localhost:9094"
+    replicationTopicNumberOfPartitions: 1
+    replicationTopicReplicationFactor: 1
+    replicationTopicRetentionMs: 3600000    # 1 hour
+    replicationHosts: "192.168.0.6:9092"
+    # replicationHosts: "192.168.0.6:9092,192.168.0.6:9093,192.168.0.6:9094"
     replicationQueueName: "/datagrid/replication/queue"
     replicationTopicMonitorBoundry: 25      # 0 - no monitoring
     replicationQueueMonitorBoundry: 25      # 0 - no monitoring
@@ -132,6 +135,8 @@ server:
     port: 9096
   requestLog:
     appenders: []
+    # appenders:
+      # - type: console
 
 # server:
   #  softNofileLimit: 1000

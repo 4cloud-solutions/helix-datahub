@@ -1,0 +1,24 @@
+version: '3'
+services:
+    
+  datahub:
+    # build: .
+    image: mpujic/helix-datahub:v1
+    ports:
+      - "9090:9090"
+    # env_file: .env
+    environment:
+      JAVA_OPTS:
+      PORT: 9090
+      DATAHUB_CONFIG_FILE: config.yml
+      REDIS_URL: redis://redis:6379
+      REDIS_URL_B: redis://redis:6379
+      HELIX_REPLICATION_ROLE: NONE
+      HELIX_REPLICATION_HOSTS: 192.168.0.6:9092
+    depends_on:
+      - redis
+    
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"

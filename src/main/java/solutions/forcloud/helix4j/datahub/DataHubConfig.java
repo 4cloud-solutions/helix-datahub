@@ -32,7 +32,17 @@ public class DataHubConfig extends Configuration {
     // Getters, Setters, toString() and hashCode() are auto-generated 
     // by Lombok based on the @Data annotation
     
-    // To help find usage of the Lombok generated getters
+    public void updateFromEnvironment() {
+        helixConfig.updateFromEnvironment();
+        
+        String key = "DATAHUB_SESSION_TIME_TO_LIVE_SECONDS";
+        String value = System.getenv(key);
+        if ((value != null) && !value.isEmpty()) {
+            sessionTimeToLiveSeconds = Integer.valueOf(value);
+        }
+    }   
+
+// To help find usage of the Lombok generated getters
     private void dummy() {
         this.getHelixConfig();
         this.getSessionTimeToLiveSeconds();
