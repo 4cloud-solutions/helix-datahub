@@ -3,7 +3,7 @@ services:
 
   datahub-a:
     # build: .
-    image: mpujic/helix-datahub:v1
+    image: 4cloudsolutions/helix-datahub:v1
     ports:
       - "9090:9090"
     # env_file: .env
@@ -28,7 +28,7 @@ services:
 
   datahub-b:
     # build: .
-    image: mpujic/helix-datahub:v1
+    image: 4cloudsolutions/helix-datahub:v1
     ports:
       - "9096:9090"
     # env_file: .env

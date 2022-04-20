@@ -85,10 +85,6 @@ public class CsidUsersProducersDataResource {
         LOGGER.debug("addUserProducerData(csid='{}', userId='{}', producerId='{}', receivedData='...') stored '{}'!", 
                 csid, userId, producerId, dataUnit);
 
-        // Find how manny subscribers there are for this producer
-        Long numberOfSubscribers = SubscriptionManager.getPerProducerSubscriptionsNumber(userId, producerId);
-        dataUnit.setNumberOfSubscribers(numberOfSubscribers);
-        
         return dataUnit;
     }        
     
@@ -118,12 +114,6 @@ public class CsidUsersProducersDataResource {
         }
         
         DataUnit dataUnit = DataManager.getProducerData(userId, producerId);        
-        if (dataUnit == null) {
-            dataUnit = new DataUnit(userId, producerId, null);
-        }
-        // Find how manny subscribers there are for this producer
-        Long numberOfSubscribers = SubscriptionManager.getPerProducerSubscriptionsNumber(userId, producerId);
-        dataUnit.setNumberOfSubscribers(numberOfSubscribers);
         
         LOGGER.debug("getUserProducerData(csid='{}', userId='{}', producerId='{}') returned '{}'!", 
                 csid, userId, producerId, dataUnit);
@@ -165,9 +155,6 @@ public class CsidUsersProducersDataResource {
                 dataUnit = DataManager.clearProducerData(userId, producerId);
             }
             success = true;
-            // Find how manny subscribers there are for this producer
-            Long numberOfSubscribers = SubscriptionManager.getPerProducerSubscriptionsNumber(userId, producerId);
-            dataUnit.setNumberOfSubscribers(numberOfSubscribers);            
         }
         
         if (!success) {

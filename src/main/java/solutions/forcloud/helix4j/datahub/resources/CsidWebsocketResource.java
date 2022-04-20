@@ -69,12 +69,13 @@ public class CsidWebsocketResource {
         
         LOGGER.debug("onOpen(csid={}) Resulting user: {}", csid, user);
 
+        String response = "{\"status\": \"CONNECTED\"}";
+        websocketSession.getAsyncRemote().sendText(response);
+
         // Process new websocket
         ConnectionManager.addLocalConnection(
                 userId, csid, ConnectionTypesEnum.WEBSOCKET, websocketSession);
         
-        String response = "{\"status\": \"CONNECTED\"}";
-        websocketSession.getAsyncRemote().sendText(response);
         LOGGER.debug("onOpen() Returned: '{}'", response);
     }
 

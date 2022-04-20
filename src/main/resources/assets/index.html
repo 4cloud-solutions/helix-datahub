@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Data Hub Client Demo</title>
+<title>Data Hub Client</title>
 <!-- meta name="viewport" content="width=device-width, initial-scale=1.0" -->
 <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
 <!-- link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous" -->
@@ -17,7 +17,7 @@
 <body>
     <div class="navbar">
         <div class="navbar-inner">
-            <a class="brand" href="#">Data Hub Client Demo</a>
+            <a class="brand" href="#">Data Hub Client</a>
         </div>
     </div>
     <div id="main" class="container">
@@ -27,13 +27,17 @@
                 <td>
                     <form class="form-horizontal">
                         <div class="control-group">
-                            <label class="control-label" for="dataHubServerHostPort">DataHub Servers</label>
-                            <div class="controls">
-                                <input data-bind="value: clientConfig().dataHubServerHostPort" type="text" id="dataHubServerHostPort" readonly>
+                            <div style="float: left;">
+                                <label class="control-label" for="dataHubServerHostPort">DataHub Servers</label>
+                                <div class="controls">
+                                    <input data-bind="value: clientConfig().dataHubServerHostPort" type="text" id="dataHubServerHostPort" readonly>
+                                </div>
                             </div>
-                            <label class="control-label" for="activeDataHubServer">Active DataHub Server</label>
-                            <div class="controls">
-                                <input data-bind="value: clientConfig().activeDataHubServer" type="text" id="activeDataHubServer" readonly>
+                            <div style="float: left;">
+                                <label class="control-label" for="activeDataHubServer">Active DataHub Server</label>
+                                <div class="controls">
+                                    <input data-bind="value: clientConfig().activeDataHubServer" type="text" id="activeDataHubServer" readonly>
+                                </div>
                             </div>
                         </div>
                     </form>                    
@@ -191,13 +195,17 @@
                 <td>
                     <form class="form-horizontal">
                         <div class="control-group">
-                            <label class="control-label" for="userIdToAdd">User ID</label>
-                            <div class="controls">
-                                <input data-bind="value: userIdToAdd" type="text" id="userIdToAdd">
+                            <div style="float: left;">
+                                <label class="control-label" for="userIdToAdd">User ID</label>
+                                <div class="controls">
+                                    <input data-bind="value: userIdToAdd" type="text" id="userIdToAdd">
+                                </div>
                             </div>
-                            <label class="control-label" for="producerIdToAdd">Producer ID</label>
-                            <div class="controls">
-                                <input data-bind="value: producerIdToAdd" type="text" id="producerIdToAdd">
+                            <div style="float: left;">
+                                <label class="control-label" for="producerIdToAdd">Producer ID</label>
+                                <div class="controls">
+                                    <input data-bind="value: producerIdToAdd" type="text" id="producerIdToAdd">
+                                </div>
                             </div>
                         </div>
                     </form>                    

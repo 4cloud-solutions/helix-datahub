@@ -4,7 +4,7 @@ services:
   datahub-a:
     # build only works with docker-compose (ignored by docker stack, which requires image)
     # build: .
-    image: mpujic/helix-datahub:v1
+    image: 4cloudsolutions/helix-datahub:v1
     ports:
       - "9090-9091:9090"
     # deploy only works with docker stack (ignored by docker-compose)
@@ -32,7 +32,7 @@ services:
   datahub-b:
     # build only works with docker-compose (ignored by docker stack, which requires image)
     # build: .
-    image: mpujic/helix-datahub:v1
+    image: 4cloudsolutions/helix-datahub:v1
     ports:
       - "9096-9097:9090"
     # deploy only works with docker stack (ignored by docker-compose)

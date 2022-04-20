@@ -34,7 +34,7 @@ public class DataUnit {
     private String data = null;
     
     @JsonProperty
-    private Long numberOfSubscribers = null;
+    private String targetedConnectionCsid = null;
     
     // Getters, Setters, toString() and hashCode() are auto-generated 
     // by Lombok based on the @Data annotation
@@ -80,7 +80,9 @@ public class DataUnit {
     }
 
     public String toString1() {
-        return String.format("%s:%s:%s > %s", userId, producerId, timestamp, data);
+        return String.format("%s:%s:%s%s > %s", userId, producerId, timestamp,
+                (targetedConnectionCsid == null) ? "" : (":" + targetedConnectionCsid), 
+                data);
     }
     
 }

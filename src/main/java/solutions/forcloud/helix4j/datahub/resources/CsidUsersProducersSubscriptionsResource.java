@@ -83,14 +83,9 @@ public class CsidUsersProducersSubscriptionsResource {
             throw new ForbiddenException(); // --------------->
         }
         
-        SubscriptionManager.addSubscription(userId, producerId, csid);
-        
-        // Get the inital data
-        DataUnit dataUnit = DataManager.getProducerData(userId, producerId);
-        if (dataUnit == null) {
-            dataUnit = new DataUnit(userId, producerId, null);
-        }
-        
+        // Add subscription and get the inital data
+        DataUnit dataUnit = SubscriptionManager.addSubscription(userId, producerId, csid);
+                
         LOGGER.debug("addSubscription(csid='{}', userId='{}', producerId='{}') returned '{}'!", 
                 csid, userId, producerId, dataUnit);
         return dataUnit;
@@ -168,9 +163,6 @@ public class CsidUsersProducersSubscriptionsResource {
             SubscriptionManager.removeSubscription(userId, producerId, csid);
             // Get the current data
             dataUnit = DataManager.getProducerData(userId, producerId);
-            if (dataUnit == null) {
-                dataUnit = new DataUnit(userId, producerId, null);
-            }
             success = true;
         }        
         
