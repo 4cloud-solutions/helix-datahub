@@ -21,26 +21,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package solutions.forcloud.helix4j.datahub.api;
-
-/**
- *
- * @author milos
- */
-public enum OperationTypesEnum {
-    
-    SIGNIN,
-    SIGNOUT, 
-    SESSIONREFRESH,
-    CONNECT,
-    CONNECT_ACK,
-    DISCONNECT,
-    PUBLISH,
-    UNPUBLISH,
-    REMOVE,
-    GETDATA,
-    SUBSCRIBE,
-    UNSUBSCRIBE,    
-    NOTIFY;
-    
-}
