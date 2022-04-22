@@ -40,9 +40,9 @@ public class DataHubDataChangeProcessor implements DataChangeProcessorIF {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataHubDataChangeProcessor.class);
     
     @Override
-    public void processDataChange(DataUnit dataChange, Set<ClientConnectionDescriptor> subscribingLocalConnections) {
+    public void processDataChange(DataUnit dataChange, ClientConnectionDescriptor subscribingLocalConnection) {
         LOGGER.debug("processDataChange() Processing data change: data={}, subscribingConnections={}!", 
-                     dataChange, subscribingLocalConnections);
+                     dataChange, subscribingLocalConnection);
         // Do application specific stuff
         // None for Data-Hub
     }
