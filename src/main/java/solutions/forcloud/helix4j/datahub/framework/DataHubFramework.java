@@ -30,7 +30,7 @@ import solutions.forcloud.helix4j.datahub.DataHubConfig;
 import solutions.forcloud.helix4j.datahub.handlers.DataHubAccessControlPoint;
 import solutions.forcloud.helix4j.datahub.handlers.DataHubDataChangeProcessor;
 import solutions.forcloud.helix4j.datahub.handlers.DataHubSessionExpiryProcessor;
-import solutions.forcloud.helix4j.framework.HelixFramework;
+import solutions.forcloud.helix4j.framework.HelixFullFramework;
 
 /**
  *
@@ -54,7 +54,7 @@ public class DataHubFramework {
         DataHubDataChangeProcessor dataHubDataChangeProcessor = 
                 new DataHubDataChangeProcessor();
         
-        HelixFramework.powerUp(helixConfig, 
+        HelixFullFramework.powerUp(helixConfig, 
                                dataHubAccessControPoint, 
                                dataHubSessionExpiryProcessor, 
                                dataHubDataChangeProcessor);
@@ -69,7 +69,7 @@ public class DataHubFramework {
     public static void powerDown() {
         LOGGER.info("powerDown() called!");
 
-        HelixFramework.powerDown();
+        HelixFullFramework.powerDown();
         
         LOGGER.info("powerDown() exited!");
     }
