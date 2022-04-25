@@ -128,8 +128,9 @@ server:
   type: simple
   # applicationContextPath: /application
   # adminContextPath: /admin
-  applicationContextPath: /data-hub/application
+  applicationContextPath: /data-hub
   adminContextPath: /data-hub/admin
+  rootPath: /api
   connector:
     type: http
     port: 9096

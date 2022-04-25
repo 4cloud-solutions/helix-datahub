@@ -81,7 +81,7 @@ import solutions.forcloud.helix4j.datahub.resources.CsidWebsocketResource;
  * III To run application:
  *     1. cd ~/workspaces/workspace-cloud/helix-datahub
  *     2. mvn package
- *     3. java -jar target/helix-datahub-1.0-SNAPSHOT.jar server config.yml
+ *     3. java -jar target/helix-datahub-1.0.jar server config.yml
  *          config.yml -------- the app server runs on port 9090 - single site (Redis), no Kafka, 1st app server
  *          config1.yml ------- the app server runs on port 9091 - single site (Redis), no Kafka, 2nd app server
  *          configA.yml ------- the app server runs on port 9090 - 1st site (Redis), with Kafka, 1st app server
@@ -94,40 +94,40 @@ Data-Hub API:
 
 http://localhost:9090/data-hub/admin
 
-http://localhost:9090/data-hub/application/healthcheck
+http://localhost:9090/data-hub/api/healthcheck
 
-http://localhost:9090/data-hub/application/assets/index.html (A Browser-based REST client)
+http://localhost:9090/data-hub/index.html (A Browser-based REST client)
 
 Sign-In i.e. create a session:
-curl -X GET    "http://localhost:9090/data-hub/application/signin?userid=u1" -H  "accept: application/json"
+curl -X GET    "http://localhost:9090/data-hub/api/signin?userid=u1" -H  "accept: application/json"
 Get session details:
-curl -X GET    "http://localhost:9090/data-hub/application/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59" -H  "accept: application/json"
+curl -X GET    "http://localhost:9090/data-hub/api/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59" -H  "accept: application/json"
 Refresh the session:
-curl -X PATCH  "http://localhost:9090/data-hub/application/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59" -H  "accept: application/json"
+curl -X PATCH  "http://localhost:9090/data-hub/api/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59" -H  "accept: application/json"
 Delete the session:
-curl -X DELETE "http://localhost:9090/data-hub/application/csid/43506746-9135-4f0c-a79a-d63e8d715aab" -H  "accept: application/json"
+curl -X DELETE "http://localhost:9090/data-hub/api/csid/43506746-9135-4f0c-a79a-d63e8d715aab" -H  "accept: application/json"
 Get all existing sessions (superadmin):
-curl -X GET    "http://localhost:9090/data-hub/application/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59/sessions" -H  "accept: application/json"
+curl -X GET    "http://localhost:9090/data-hub/api/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59/sessions" -H  "accept: application/json"
 Get all existing connections (superadmin):
-curl -X GET    "http://localhost:9090/data-hub/application/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59/connections" -H  "accept: application/json"
+curl -X GET    "http://localhost:9090/data-hub/api/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59/connections" -H  "accept: application/json"
 Get all existing users (superadmin):
-curl -X GET    "http://localhost:9090/data-hub/application/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59/users" -H  "accept: application/json"
+curl -X GET    "http://localhost:9090/data-hub/api/csid/25cd5afb-5ad1-4624-a869-dbd8b6986b59/users" -H  "accept: application/json"
 Add producer data:
-curl -X PUT    "http://localhost:9090/data-hub/application/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/data" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"data\":\"/u1/p1/TEST_DATA\"}"
+curl -X PUT    "http://localhost:9090/data-hub/api/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/data" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"data\":\"/u1/p1/TEST_DATA\"}"
 Get producer data:
-curl -X GET    "http://localhost:9090/data-hub/application/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/data" -H  "accept: application/json"
+curl -X GET    "http://localhost:9090/data-hub/api/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/data" -H  "accept: application/json"
 Delete producer data:
-curl -X DELETE "http://localhost:9090/data-hub/application/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/data" -H  "accept: application/json"
+curl -X DELETE "http://localhost:9090/data-hub/api/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/data" -H  "accept: application/json"
 Get user data (all producers of a user):
-curl -X GET    "http://localhost:9090/data-hub/application/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/data" -H  "accept: application/json"
+curl -X GET    "http://localhost:9090/data-hub/api/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/data" -H  "accept: application/json"
 Subscribe:
-curl -X POST   "http://localhost:9090/data-hub/application/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/subscriptions" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"subscriberId\":\"s1\"}"
+curl -X POST   "http://localhost:9090/data-hub/api/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/subscriptions" -H  "accept: application/json" -H  "Content-Type: application/json" -d "{\"subscriberId\":\"s1\"}"
 Check subscription:
-curl -X GET    "http://localhost:9090/data-hub/application/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/subscriptions" -H  "accept: application/json"
+curl -X GET    "http://localhost:9090/data-hub/api/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/subscriptions" -H  "accept: application/json"
 Unsubscribe:
-curl -X DELETE "http://localhost:9090/data-hub/application/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/subscriptions" -H  "accept: application/json"
+curl -X DELETE "http://localhost:9090/data-hub/api/csid/4e103a5b-f42a-4088-a43e-22e634f99189/users/u1/producers/p1/subscriptions" -H  "accept: application/json"
  
-Websocket:        ws://localhost:9090/data-hub/application/csid/4e103a5b-f42a-4088-a43e-22e634f99189/websocket
+Websocket:        ws://localhost:9090/data-hub/api/csid/4e103a5b-f42a-4088-a43e-22e634f99189/websocket
 
 Important Redis objects:
 ========================
@@ -173,7 +173,7 @@ public class DataHubApp extends Application<DataHubConfig> {
     @Override
     public void initialize(final Bootstrap<DataHubConfig> bootstrap) {
         LOGGER.info("initialize() called!");
-        bootstrap.addBundle(new AssetsBundle("/assets", "/assets", "index.html"));
+        bootstrap.addBundle(new AssetsBundle("/assets", "/"));
         bootstrap.addBundle(new WebsocketBundle(CsidWebsocketResource.class));
     }
 

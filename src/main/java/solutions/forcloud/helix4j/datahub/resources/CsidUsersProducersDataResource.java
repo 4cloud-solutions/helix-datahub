@@ -50,7 +50,6 @@ import solutions.forcloud.helix4j.modules.datamanagement.DataManager;
 import solutions.forcloud.helix4j.modules.datamanagement.DataUnit;
 import solutions.forcloud.helix4j.modules.sessionmanagement.ClientSession;
 import solutions.forcloud.helix4j.modules.sessionmanagement.SessionManager;
-import solutions.forcloud.helix4j.modules.subscriptionmanagement.SubscriptionManager;
 import solutions.forcloud.helix4j.utils.Utilities;
 import solutions.forcloud.helix4j.datahub.DataHubConfig;
 import solutions.forcloud.helix4j.datahub.api.DataHubData;
@@ -58,6 +57,9 @@ import solutions.forcloud.helix4j.datahub.api.DataHubData;
 /**
  *
  * @author mpujic
+ * 
+ * The path is preceded by elements defined in the config.yml file:
+ *   server.applicationContextPath + server.rootPath
  */
 @Timed
 @Path("/csid/{csid}/users/{userid}/producers/{producerid}/data")

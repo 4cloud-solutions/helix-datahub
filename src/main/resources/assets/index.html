@@ -385,20 +385,20 @@
         
         // 
         // window.location.hostname -> localhost
-        // window.location.href -> http://localhost:9090/data-hub/application/assets/index.html
+        // window.location.href -> http://localhost:9090/data-hub/index.html
         var urlComponents = window.location.href.split('/');
         self.secureProtocol = (urlComponents[0] == "https:");
         self.hostPort = urlComponents[2];
         console.log(`SECURE-PROTOCOL = ${self.secureProtocol} | HOST:PORT = ${self.hostPort}`);
         
         // self.baseUri = function () {
-        //     return "/data-hub/application";
+        //     return "/data-hub/api";
         // };
         // self.baseUri = function() {
-        //     return "http://localhost:9090/data-hub/application";
+        //     return "http://localhost:9090/data-hub/api";
         // };
         self.baseUri = function() {
-            return (self.secureProtocol ? "https:" : "http:") + "//" + self.hostPort + "/data-hub/application";
+            return (self.secureProtocol ? "https:" : "http:") + "//" + self.hostPort + "/data-hub/api";
         };
         self.signinUri = function(userId) {
             var uri = self.baseUri() + "/signin?userid=" + userId;

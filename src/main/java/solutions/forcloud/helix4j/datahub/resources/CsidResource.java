@@ -50,6 +50,9 @@ import solutions.forcloud.helix4j.datahub.api.Result;
 /**
  *
  * @author mpujic
+ * 
+ * The path is preceded by elements defined in the config.yml file:
+ *   server.applicationContextPath + server.rootPath
  */
 @Timed
 @Path("/csid/{csid}")

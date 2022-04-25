@@ -53,11 +53,14 @@ import solutions.forcloud.helix4j.utils.Utilities;
 /**
  *
  * @author mpujic
+ * 
+ * The path is preceded by elements defined in the config.yml file:
+ *   server.applicationContextPath
  */
 @Metered
 @ExceptionMetered
 @Timed
-@ServerEndpoint(value = "/csid/{csid}/websocket", configurator = CsidWebsocketEndpointConfig.class)
+@ServerEndpoint(value = "/api/csid/{csid}/websocket", configurator = CsidWebsocketEndpointConfig.class)
 public class CsidWebsocketResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CsidWebsocketResource.class);
