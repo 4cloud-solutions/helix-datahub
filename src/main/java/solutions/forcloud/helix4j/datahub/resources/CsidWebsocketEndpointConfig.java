@@ -33,7 +33,7 @@ public class CsidWebsocketEndpointConfig extends BaseWebsocketEndpointConfig  {
 
     @Override
     public String extractCsid(String path) {
-        // Websocket resource path is "/data-hub/api/csid/{csid}/websocket"
+        // Websocket resource path is "/data-store/api/csid/{csid}/websocket"
         String csid = path.split("/")[4];
         return csid;
     }

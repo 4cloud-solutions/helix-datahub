@@ -25,26 +25,55 @@ package solutions.forcloud.helix4j.datahub.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 /**
  *
  * @author mpujic
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 // Ignore null fields
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Subscriber {
+public class DataProducer {
 
     @JsonProperty
-    private String subscriberId;
+    private String userId;
     
-    // Getters, Setters, toString() and hashCode() are auto-generated 
-    // by Lombok based on the @Data annotation
-        
+    @JsonProperty
+    private String producerId;
+    
+    
+    // No-arguments constructor is required for JSON --> Object mapping by Jackson
+    public DataProducer() {        
+    }
+    
+    public DataProducer(String userId, String producerId) {
+        this.userId = userId;
+        this.producerId = producerId;        
+    }
+    
+    public String getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+    
+    public String getProducerId() {
+        return producerId;
+    }
+    
+    public void setProducerId(String producerId) {
+        this.producerId = producerId;
+    }
+    
+    public String toString1() {
+        return String.format("%s:%s", userId, producerId);
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s(%s)", DataProducer.class.getSimpleName(), toString1());
+    }
+    
 }

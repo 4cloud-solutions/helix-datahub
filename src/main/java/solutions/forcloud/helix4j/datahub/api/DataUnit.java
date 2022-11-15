@@ -23,39 +23,28 @@
  */
 package solutions.forcloud.helix4j.datahub.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
+
 
 /**
  *
  * @author milos
  */
-@Data
 // Ignore null fields
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataUnit {
 
     @JsonProperty
-    private String userId = null;
+    private DataProducer producer = null;
     
     @JsonProperty
-    private String producerId = null;
-    
-    @JsonProperty
-    private Long timestamp = null;
-    
-    // Producer data
-    @JsonProperty
-    private String data = null;
+    private DataTuple dataTuple = null;
     
     @JsonProperty
     private String targetedConnectionCsid = null;
     
-    // Getters, Setters, toString() and hashCode() are auto-generated 
-    // by Lombok based on the @Data annotation
     
     // No-arguments constructor is required for JSON --> Object mapping by Jackson
     // Should be private so it cannot be explicitly used outside the class
@@ -63,44 +52,71 @@ public class DataUnit {
     }
     
     public DataUnit(String userId, String producerId, String data) {
-        this.userId = userId;
-        this.producerId = producerId;
-        this.data = data;
-        this.timestamp = System.currentTimeMillis();
+        this.producer = new DataProducer(userId, producerId);
+        this.dataTuple = new DataTuple(data);
     }
     
-    @JsonProperty
-    public void resetData(String data) {
-        this.data = data;
-        this.timestamp = System.currentTimeMillis();        
+    public DataUnit(String userId, String producerId, DataTuple dataTuple) {
+        this.producer = new DataProducer(userId, producerId);
+        this.dataTuple = dataTuple;
     }
+    
+    public DataProducer getProducer() {
+        return producer;
+    }    
 
-    public DataUnit fromFlat(String jsonStr) {
-        DataUnit object = null;
-        if (jsonStr != null) {
-            try {
-                object = new ObjectMapper().readValue(jsonStr, DataUnit.class);
-            } catch (JsonProcessingException ex) {
-                // LOGGER.error(null, ex);
-            }
-        }
-        return object;
-    }
+    public void setProducer(DataProducer producer) {
+        this.producer = producer;
+    }    
 
-    public String toFlat() {
-        String jsonStr = null;
-        try {
-            jsonStr = new ObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException ex) {
-            // LOGGER.error(null, ex);
-        }
-        return jsonStr;
+    public DataTuple getDataTuple() {
+        return dataTuple;
+    }    
+
+    public void setDataTuple(DataTuple dataTuple) {
+        this.dataTuple = dataTuple;
     }
+    
+    public String getTargetedConnectionCsid() {
+        return targetedConnectionCsid;
+    }    
+
+    public void setTargetedConnectionCsid(String targetedConnectionCsid) {
+        this.targetedConnectionCsid = targetedConnectionCsid;
+    }    
+
+    // Convenience function
+    @JsonIgnore
+    public String getUserId() {
+        return producer.getUserId();
+    }    
+
+    // Convenience function
+    @JsonIgnore
+    public String getProducerId() {
+        return producer.getProducerId();
+    }
+    
+    @JsonIgnore
+    public Long getTimestamp() {
+        return dataTuple.getTimestamp();
+    }    
+
+    @JsonIgnore
+    public String getData() {
+        return dataTuple.getData();
+    }    
 
     public String toString1() {
-        return String.format("%s:%s:%s%s > %s", userId, producerId, timestamp,
-                (targetedConnectionCsid == null) ? "" : (":" + targetedConnectionCsid), 
-                data);
+        return String.format("%s > %s%s", 
+                (producer == null) ?  "NULL-PRODUCER" : producer.toString1(), 
+                (dataTuple == null) ? "null" : dataTuple.toString1(),
+                (targetedConnectionCsid == null) ? "" : (" @" + targetedConnectionCsid));
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s(%s)", DataUnit.class.getSimpleName(), toString1());
     }
     
 }

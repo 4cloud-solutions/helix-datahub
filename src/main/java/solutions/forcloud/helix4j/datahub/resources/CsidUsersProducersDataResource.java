@@ -46,13 +46,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import solutions.forcloud.helix4j.datagridclient.DatagridClient;
 import solutions.forcloud.helix4j.modules.authorization.AccessTypesEnum;
-import solutions.forcloud.helix4j.modules.datamanagement.DataManager;
-import solutions.forcloud.helix4j.modules.datamanagement.DataUnit;
+import solutions.forcloud.helix4j.datamodel.DataUnit;
 import solutions.forcloud.helix4j.modules.sessionmanagement.ClientSession;
 import solutions.forcloud.helix4j.modules.sessionmanagement.SessionManager;
 import solutions.forcloud.helix4j.utils.Utilities;
 import solutions.forcloud.helix4j.datahub.DataHubConfig;
 import solutions.forcloud.helix4j.datahub.api.DataHubData;
+import solutions.forcloud.helix4j.framework.HelixFramework;
+import solutions.forcloud.helix4j.modules.datamanagement.DataManagerIF;
 
 /**
  *
@@ -100,7 +101,7 @@ public class CsidUsersProducersDataResource {
             throw new ForbiddenException(); // --------------->
         }
         
-        DataUnit dataUnit = DataManager.addUpdateProducerData(userId, producerId, receivedData.toFlat());
+        DataUnit dataUnit = HelixFramework.getDataManager().addProducerData(userId, producerId, receivedData.toFlat());
 
         LOGGER.debug("addUserProducerData(csid='{}', userId='{}', producerId='{}', receivedData='...') stored '{}'!", 
                 csid, userId, producerId, dataUnit);
@@ -133,7 +134,7 @@ public class CsidUsersProducersDataResource {
             throw new ForbiddenException(); // --------------->
         }
         
-        DataUnit dataUnit = DataManager.getProducerData(userId, producerId);        
+        DataUnit dataUnit = HelixFramework.getDataManager().getProducerData(userId, producerId);        
         
         LOGGER.debug("getUserProducerData(csid='{}', userId='{}', producerId='{}') returned '{}'!", 
                 csid, userId, producerId, dataUnit);
@@ -168,11 +169,12 @@ public class CsidUsersProducersDataResource {
         
         boolean success = false;
         DataUnit dataUnit = null;
-        if (DataManager.containsProducerData(userId, producerId)) {
+        DataManagerIF dataManager = HelixFramework.getDataManager();
+        if (dataManager.containsProducerData(userId, producerId)) {
             if (removeFlag) {
-                dataUnit = DataManager.removeProducerData(userId, producerId);
+                dataUnit = dataManager.removeProducerData(userId, producerId);
             } else {
-                dataUnit = DataManager.clearProducerData(userId, producerId);
+                dataUnit = dataManager.clearProducerData(userId, producerId);
             }
             success = true;
         }

@@ -27,14 +27,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 
 
 /**
  *
  * @author mpujic
  */
-@Data
 // Ignore null fields
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataHubData {
@@ -42,9 +40,6 @@ public class DataHubData {
     @JsonProperty
     private String data;
     
-    
-    // Getters, Setters, toString() and hashCode() are auto-generated 
-    // by Lombok based on the @Data annotation
     
     // No-arguments constructor is required for JSON --> Object mapping by Jackson
     public DataHubData() {
@@ -54,6 +49,14 @@ public class DataHubData {
         this.data = data;
     }
     
+    public String getData() {
+        return data;
+    }    
+
+    public void setData(String data) {
+        this.data = data;
+    }    
+
     public DataHubData fromFlat(String jsonStr) {
         DataHubData object = null;
         if (jsonStr != null) {
@@ -75,4 +78,5 @@ public class DataHubData {
         }
         return jsonStr;
     }
+    
 }

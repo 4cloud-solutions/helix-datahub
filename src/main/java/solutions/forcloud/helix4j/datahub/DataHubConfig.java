@@ -26,18 +26,12 @@ package solutions.forcloud.helix4j.datahub;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import javax.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import solutions.forcloud.helix4j.HelixConfig;
 
 /**
  *
  * @author milos
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class DataHubConfig extends Configuration {
 
     @JsonProperty
@@ -47,9 +41,34 @@ public class DataHubConfig extends Configuration {
     @Min(60)    
     private Integer sessionTimeToLiveSeconds = 900;   // seconds
 
-    // Getters, Setters, toString() and hashCode() are auto-generated 
-    // by Lombok based on the @Data annotation
+
+    // No-arguments constructor is required for JSON --> Object mapping by Jackson
+    // Should be private so it cannot be explicitly used outside the class
+    public DataHubConfig() {
+        super();
+    }
     
+    public DataHubConfig(HelixConfig helixConfig, Integer sessionTimeToLiveSeconds) {
+        this.helixConfig = helixConfig;
+        this.sessionTimeToLiveSeconds = sessionTimeToLiveSeconds;
+    }
+    
+    public Integer getSessionTimeToLiveSeconds() {
+        return sessionTimeToLiveSeconds;
+    }    
+
+    public void setSessionTimeToLiveSeconds(Integer sessionTimeToLiveSeconds) {
+        this.sessionTimeToLiveSeconds = sessionTimeToLiveSeconds;
+    }    
+
+    public HelixConfig getHelixConfig() {
+        return helixConfig;
+    }    
+
+    public void setHelixConfig(HelixConfig helixConfig) {
+        this.helixConfig = helixConfig;
+    }    
+
     public void updateFromEnvironment() {
         helixConfig.updateFromEnvironment();
         
@@ -59,11 +78,5 @@ public class DataHubConfig extends Configuration {
             sessionTimeToLiveSeconds = Integer.valueOf(value);
         }
     }   
-
-// To help find usage of the Lombok generated getters
-    private void dummy() {
-        this.getHelixConfig();
-        this.getSessionTimeToLiveSeconds();
-    }
        
 }

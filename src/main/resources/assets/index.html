@@ -724,9 +724,9 @@
                 if (isEmpty(dataUnit)) {
                     producer.setAt("---");
                 } else {
-                    producer.producerId(dataUnit.producerId);
+                    producer.producerId(dataUnit.producer.producerId);
                     producer.data(self.getAppData(dataUnit));                        
-                    producer.setAt(dataUnit.timestamp);
+                    producer.setAt(dataUnit.dataTuple.timestamp);
                 }
             });
         };
@@ -743,9 +743,9 @@
                 if (isEmpty(dataUnit))  {
                     producer.setAt("---");
                 } else {
-                    producer.producerId(dataUnit.producerId);
+                    producer.producerId(dataUnit.producer.producerId);
                     producer.data(self.getAppData(dataUnit));                        
-                    producer.setAt(dataUnit.timestamp);
+                    producer.setAt(dataUnit.dataTuple.timestamp);
                 }
             });
         };
@@ -861,9 +861,9 @@
                     
         self.handleDataUpdate = function(dataUnit) {
             console.log(`handleDataUpdate() dataUnit=${toString(dataUnit)}`);
-            var userId = dataUnit.userId;
-            var producerId = dataUnit.producerId;
-            var setAt = dataUnit.timestamp;
+            var userId = dataUnit.producer.userId;
+            var producerId = dataUnit.producer.producerId;
+            var setAt = dataUnit.dataTuple.timestamp;
             var data = self.getAppData(dataUnit);
             if (userId == self.userSession().userId) {
                 for (producer of self.ownProducers()) {
@@ -1073,17 +1073,17 @@
         };
         
         self.isDataUnit = function(object) {
-            if (!object.hasOwnProperty("userId")) {
+            if (!object.hasOwnProperty("producer")) {
                 return false;
             }
-            if (!object.hasOwnProperty("producerId")) {
+            if (!object.hasOwnProperty("dataTuple")) {
                 return false;
             }
             return true;
         };
         
         self.getAppData = function(dataUnit) {
-            var appData = parseJSON(dataUnit.data);
+            var appData = parseJSON(dataUnit.dataTuple.data);
             if (appData == null) {
                 return null;
             } else {

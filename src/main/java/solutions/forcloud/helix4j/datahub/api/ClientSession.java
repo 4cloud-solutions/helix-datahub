@@ -25,17 +25,11 @@ package solutions.forcloud.helix4j.datahub.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  *
  * @author milos
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 // Ignore null fields
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ClientSession {
@@ -58,7 +52,60 @@ public class ClientSession {
     @JsonProperty
     private Long expiryTimestamp = Long.MAX_VALUE;
     
-    // Getters, Setters, toString() and hashCode() are auto-generated 
-    // by Lombok based on the @Data annotation
+
+    public ClientSession() {
+    }
     
+    public ClientSession(String csid, 
+                         String userId,
+                         String authToken,
+                         Long creationTimestamp,
+                         Long expiryTimestamp) {
+        this.csid = csid;
+        this.userId = userId;
+        this.authToken = authToken;
+        this.creationTimestamp = creationTimestamp;
+        this.expiryTimestamp = expiryTimestamp;
+    }
+    
+    public String getCsid() {
+        return csid;
+    }    
+
+    public void setCsid(String csid) {
+        this.csid = csid;
+    }    
+
+    public String getUserId() {
+        return userId;
+    }    
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }    
+
+    public String getAuthToken() {
+        return authToken;
+    }    
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }    
+
+    public Long getCreationTimestamp() {
+        return creationTimestamp;
+    }    
+
+    public void setCreationTimestamp(Long creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
+    }    
+
+    public Long getExpiryTimestamp() {
+        return expiryTimestamp;
+    }    
+
+    public void setExpiryTimestamp(Long expiryTimestamp) {
+        this.expiryTimestamp = expiryTimestamp;
+    }    
+
 }

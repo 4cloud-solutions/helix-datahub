@@ -27,8 +27,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import solutions.forcloud.helix4j.modules.connectionmanagement.ClientConnectionDescriptor;
-import solutions.forcloud.helix4j.modules.datamanagement.DataUnit;
-import solutions.forcloud.helix4j.modules.datamanagement.DataChangeProcessorIF;
+import solutions.forcloud.helix4j.datamodel.DataUnit;
+import solutions.forcloud.helix4j.modules.subscriptionmanagement.DataChangeProcessorIF;
 
 
 /**

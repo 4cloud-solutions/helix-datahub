@@ -25,17 +25,11 @@ package solutions.forcloud.helix4j.datahub.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  *
  * @author mpujic
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 // Ignore null fields
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result {
@@ -43,7 +37,21 @@ public class Result {
     @JsonProperty
     private Boolean success = true;
     
-    // Getters, Setters, toString() and hashCode() are auto-generated 
-    // by Lombok based on the @Data annotation
 
+    // No-arguments constructor is required for JSON --> Object mapping by Jackson
+    public Result() {        
+    }
+    
+    public Result(Boolean success) {
+        this.success = success;
+    }
+    
+    public Boolean getSuccess() {
+        return success;
+    }
+    
+    public void setSuccess(Boolean success) {
+        this.success = success;
+    }
+    
 }

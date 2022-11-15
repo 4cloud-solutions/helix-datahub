@@ -15,7 +15,7 @@ services:
     environment:
       JAVA_OPTS:
       PORT: 9090
-      DATAHUB_CONFIG_FILE: config.yml
+      DATAHUB_CONFIG_FILE: config1.yml
       REDIS_URL: redis://redis-a:6379
       REDIS_URL_B: redis://redis-b:6379
       HELIX_REPLICATION_ROLE: A
@@ -43,7 +43,7 @@ services:
     environment:
       JAVA_OPTS:
       PORT: 9090
-      DATAHUB_CONFIG_FILE: config.yml
+      DATAHUB_CONFIG_FILE: config1.yml
       REDIS_URL: redis://redis-a:6379
       REDIS_URL_B: redis://redis-b:6379
       HELIX_REPLICATION_ROLE: B

@@ -30,7 +30,9 @@ import solutions.forcloud.helix4j.datahub.DataHubConfig;
 import solutions.forcloud.helix4j.datahub.handlers.DataHubAccessControlPoint;
 import solutions.forcloud.helix4j.datahub.handlers.DataHubDataChangeProcessor;
 import solutions.forcloud.helix4j.datahub.handlers.DataHubSessionExpiryProcessor;
-import solutions.forcloud.helix4j.framework.HelixFullFramework;
+import solutions.forcloud.helix4j.framework.HelixFramework;
+import solutions.forcloud.helix4j.modules.datamanagement.DataManagerIF;
+import solutions.forcloud.helix4j.modules.datamanagement.DataManager;
 
 /**
  *
@@ -47,6 +49,7 @@ public class DataHubFramework {
         
         dataHubConfig = configuration;
         HelixConfig helixConfig = configuration.getHelixConfig();
+        DataManagerIF dataManager = new DataManager("USER_%s_DATAMAP"); // userId injected
         DataHubSessionExpiryProcessor dataHubSessionExpiryProcessor = 
                 new DataHubSessionExpiryProcessor("DATA_HUB_" + helixConfig.getNodeId() + "_SESSION_EXPIRY_PROCESSOR");
         DataHubAccessControlPoint dataHubAccessControPoint = 
@@ -54,7 +57,8 @@ public class DataHubFramework {
         DataHubDataChangeProcessor dataHubDataChangeProcessor = 
                 new DataHubDataChangeProcessor();
         
-        HelixFullFramework.powerUp(helixConfig, 
+        HelixFramework.powerUp(helixConfig,
+                               dataManager,
                                dataHubAccessControPoint, 
                                dataHubSessionExpiryProcessor, 
                                dataHubDataChangeProcessor);
@@ -69,7 +73,7 @@ public class DataHubFramework {
     public static void powerDown() {
         LOGGER.info("powerDown() called!");
 
-        HelixFullFramework.powerDown();
+        HelixFramework.powerDown();
         
         LOGGER.info("powerDown() exited!");
     }

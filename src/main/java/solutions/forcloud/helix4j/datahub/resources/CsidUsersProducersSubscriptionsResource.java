@@ -47,8 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import solutions.forcloud.helix4j.datagridclient.DatagridClient;
 import solutions.forcloud.helix4j.modules.authorization.AccessTypesEnum;
-import solutions.forcloud.helix4j.modules.datamanagement.DataUnit;
-import solutions.forcloud.helix4j.modules.datamanagement.DataManager;
+import solutions.forcloud.helix4j.datamodel.DataUnit;
 import solutions.forcloud.helix4j.modules.sessionmanagement.ClientSession;
 import solutions.forcloud.helix4j.modules.sessionmanagement.SessionManager;
 import solutions.forcloud.helix4j.modules.subscriptionmanagement.SubscriptionManager;
@@ -56,7 +55,8 @@ import solutions.forcloud.helix4j.modules.usermanagement.User;
 import solutions.forcloud.helix4j.modules.usermanagement.UserManager;
 import solutions.forcloud.helix4j.utils.Utilities;
 import solutions.forcloud.helix4j.datahub.DataHubConfig;
-import solutions.forcloud.helix4j.datahub.api.Subscriber;
+import solutions.forcloud.helix4j.datahub.api.DataSubscriber;
+import solutions.forcloud.helix4j.framework.HelixFramework;
 
 /**
  *
@@ -87,7 +87,7 @@ public class CsidUsersProducersSubscriptionsResource {
             @PathParam("csid") String csid, 
             @PathParam("userid") String userId,
             @PathParam("producerid") String producerId,
-            Subscriber subscriber,
+            DataSubscriber subscriber,
             @Context HttpHeaders httpHeaders) {
 
         LOGGER.debug("addSubscription(csid='{}', userId='{}', producerId='{}', subscriberId='{}') called!", 
@@ -183,7 +183,7 @@ public class CsidUsersProducersSubscriptionsResource {
         if (SubscriptionManager.containsSubscription(userId, producerId, csid)) {
             SubscriptionManager.removeSubscription(userId, producerId, csid);
             // Get the current data
-            dataUnit = DataManager.getProducerData(userId, producerId);
+            dataUnit = HelixFramework.getDataManager().getProducerData(userId, producerId);
             success = true;
         }        
         
